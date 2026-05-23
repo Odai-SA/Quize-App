@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<!-- ==================== APP NAME ==================== -->
+<string name="app_name">Quize</string>
+
+<!-- ==================== SPLASH SCREEN ==================== -->
+<string name="splash_title">Quize</string>
+<string name="splash_subtitle">Test Your Knowledge</string>
+
+<!-- ==================== ONBOARDING SCREEN ==================== -->
+<string name="onboarding_title">Welcome to Quize</string>
+<string name="onboarding_description">Challenge yourself with trivia questions across multiple categories and difficulty levels. Compete to get the highest score!</string>
+<string name="onboarding_button_start">Get Started</string>
+    <string name="onboarding_title_1">Welcome to Quize</string>
+    <string name="onboarding_desc_1">Test your knowledge with fun trivia questions across every topic imaginable!</string>
+
+    <string name="onboarding_title_2">Choose Your Category</string>
+    <string name="onboarding_desc_2">From Movies and Music to Science and History — pick what you love!</string>
+
+    <string name="onboarding_title_3">Compete &amp; Win</string>
+    <string name="onboarding_desc_3">Select your difficulty, answer questions, and chase the high score!</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="get_started">Get Started</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_skip">Skip</string>
+<!-- ==================== LOGIN SCREEN ==================== -->
+<string name="login_title">Login</string>
+<string name="login_username_hint">Username</string>
+<string name="login_password_hint">Password</string>
+<string name="login_button">Login</string>
+<string name="login_no_account">Don\'t have an account?</string>
+<string name="login_register_link">Register</string>
+<string name="login_guest_button">Play as Guest</string>
+<string name="login_error_empty">Please enter username and password</string>
+
+<!-- ==================== REGISTER SCREEN ==================== -->
+<string name="register_title">Create Account</string>
+<string name="register_username_hint">Username</string>
+<string name="register_password_hint">Password</string>
+<string name="register_confirm_password_hint">Confirm Password</string>
+<string name="register_button">Register</string>
+<string name="register_have_account">Already have an account?</string>
+<string name="register_login_link">Login</string>
+<string name="register_error_empty">All fields are required</string>
+<string name="register_error_password_match">Passwords do not match</string>
+
+<!-- ==================== HOME / CATEGORY SCREEN ==================== -->
+<string name="home_title">Select Category</string>
+<string name="home_welcome">Welcome</string>
+<string name="home_guest_welcome">Welcome, Guest</string>
+<string name="home_button_settings">Settings</string>
+<string name="home_button_logout">Logout</string>
+
+<!-- ==================== QUIZ SETUP SCREEN ==================== -->
+<string name="setup_title">Quiz Setup</string>
+<string name="setup_difficulty_label">Select Difficulty</string>
+<string name="setup_difficulty_easy">Easy</string>
+<string name="setup_difficulty_medium">Medium</string>
+<string name="setup_difficulty_hard">Hard</string>
+<string name="setup_questions_label">Number of Questions</string>
+<string name="setup_button_start">Start Quiz</string>
+
+<!-- ==================== QUIZ SCREEN ==================== -->
+<string name="quiz_question_counter">Question %1$d of %2$d</string>
+<string name="quiz_button_next">Next</string>
+<string name="quiz_button_finish">Finish</string>
+<string name="quiz_score_label">Score: %1$d</string>
+
+<!-- ==================== SCORE SCREEN ==================== -->
+<string name="score_title">Quiz Completed</string>
+<string name="score_result">Your Score: %1$d / %2$d</string>
+<string name="score_button_home">Back to Home</string>
+<string name="score_button_retry">Try Again</string>
+<string name="score_no_history">Login to save your scores</string>
+
+<!-- ==================== SETTINGS SCREEN ==================== -->
+<string name="settings_title">Settings</string>
+<string name="settings_username_label">Username</string>
+<string name="settings_username_hint">Enter your username</string>
+<string name="settings_button_save">Save</string>
+<string name="settings_theme_label">Theme</string>
+<string name="settings_theme_light">Light</string>
+<string name="settings_theme_dark">Dark</string>
+<string name="settings_theme_system">System Default</string>
+<string name="settings_saved">Settings saved</string>
+
+<!-- ==================== GENERAL / ERRORS ==================== -->
+<string name="error_generic">Something went wrong. Please try again.</string>
+<string name="error_network">Network error. Check your connection.</string>
+<string name="button_back">Back</string>
+
+</resources>
