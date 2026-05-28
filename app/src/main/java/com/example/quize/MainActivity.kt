@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -23,7 +24,6 @@ import com.example.quize.presentation.screens.quiz.QuizScreen
 import com.example.quize.presentation.screens.quizsetup.QuizSetupScreen
 import com.example.quize.presentation.screens.register.RegisterScreen
 import com.example.quize.presentation.screens.score.ScoreScreen
-import com.example.quize.presentation.screens.settings.SettingsScreen
 import com.example.quize.presentation.screens.splash.SplashScreen
 import com.example.quize.ui.theme.QuizeTheme
 
@@ -31,7 +31,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // FORCE LTR FOR ENTIRE APP — regardless of phone language
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 QuizeTheme {
                     val navController = rememberNavController()
@@ -60,20 +59,35 @@ class MainActivity : ComponentActivity() {
                             HomeScreen(navController = navController)
                         }
 
-                        animatedComposable(Screen.QuizSetup.route) {
-                            QuizSetupScreen(navController = navController)
+                        animatedComposable(Screen.QuizSetup.route) { backStackEntry ->
+                            val categoryId = backStackEntry.arguments?.getString("categoryId")?.toIntOrNull() ?: 9
+                            val categoryName = backStackEntry.arguments?.getString("categoryName") ?: "General Knowledge"
+                            QuizSetupScreen(
+                                navController = navController,
+                                categoryId = categoryId,
+                                categoryName = categoryName
+                            )
                         }
 
-                        animatedComposable(Screen.Quiz.route) {
-                            QuizScreen(navController = navController)
+                        animatedComposable(Screen.Quiz.route) { backStackEntry ->
+                            val categoryId = backStackEntry.arguments?.getString("categoryId")?.toIntOrNull() ?: 9
+                            val difficulty = backStackEntry.arguments?.getString("difficulty") ?: "easy"
+                            val amount = backStackEntry.arguments?.getString("amount")?.toIntOrNull() ?: 10
+                            QuizScreen(
+                                navController = navController,
+                                categoryId = categoryId,
+                                difficulty = difficulty,
+                                amount = amount
+                            )
                         }
-
-                        animatedComposable(Screen.Score.route) {
-                            ScoreScreen(navController = navController)
-                        }
-
-                        animatedComposable(Screen.Settings.route) {
-                            SettingsScreen(navController = navController)
+                        animatedComposable(Screen.Score.route) { backStackEntry ->
+                            val score = backStackEntry.arguments?.getString("score")?.toIntOrNull() ?: 0
+                            val total = backStackEntry.arguments?.getString("total")?.toIntOrNull() ?: 0
+                            ScoreScreen(
+                                navController = navController,
+                                score = score,
+                                total = total
+                            )
                         }
                     }
                 }
@@ -84,7 +98,7 @@ class MainActivity : ComponentActivity() {
 
 private fun NavGraphBuilder.animatedComposable(
     route: String,
-    content: @Composable () -> Unit
+    content: @Composable (NavBackStackEntry) -> Unit
 ) {
     composable(
         route = route,
@@ -112,7 +126,7 @@ private fun NavGraphBuilder.animatedComposable(
                 animationSpec = tween(400)
             ) + fadeOut(tween(400))
         }
-    ) {
-        content()
+    ) { backStackEntry ->
+        content(backStackEntry)
     }
 }

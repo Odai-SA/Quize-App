@@ -1,5 +1,6 @@
 package com.example.quize.presentation.screens.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,7 +16,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.quize.R
 import com.example.quize.presentation.navigation.Screen
+import com.example.quize.ui.theme.*
 
 data class Category(val id: Int, val name: String, val emoji: String)
 
@@ -62,29 +63,25 @@ fun HomeScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(id = R.string.home_title)) },
+                title = { Text(stringResource(id = R.string.home_title), color = DarkOnPrimary) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                actions = {
-                    TextButton(onClick = { navController.navigate(Screen.Settings.route) }) {
-                        Text(text = "⚙️", fontSize = MaterialTheme.typography.titleLarge.fontSize)
-                    }
-                }
+                    containerColor = DarkPrimary,
+                    titleContentColor = DarkOnPrimary
+                )
             )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(DarkBackground)
                 .padding(padding)
                 .padding(16.dp)
         ) {
             Text(
                 text = stringResource(id = R.string.home_welcome),
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.primary,
+                color = DarkOnSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -93,9 +90,13 @@ fun HomeScreen(navController: NavController) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { navController.navigate(Screen.QuizSetup.route) },
+                            .clickable {
+                                navController.navigate(
+                                    Screen.QuizSetup.createRoute(category.id, category.name)
+                                )
+                            },
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                            containerColor = DarkSurface
                         )
                     ) {
                         Row(
@@ -112,7 +113,7 @@ fun HomeScreen(navController: NavController) {
                             Text(
                                 text = category.name,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = DarkOnSurface
                             )
                         }
                     }

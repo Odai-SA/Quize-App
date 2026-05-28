@@ -35,7 +35,11 @@ import com.example.quize.presentation.navigation.Screen
 import com.example.quize.ui.theme.*
 
 @Composable
-fun QuizSetupScreen(navController: NavController) {
+fun QuizSetupScreen(
+    navController: NavController,
+    categoryId: Int = 9,
+    categoryName: String = "General Knowledge"
+) {
     var difficulty by remember { mutableStateOf("easy") }
     var questionCount by remember { mutableIntStateOf(10) }
 
@@ -47,6 +51,14 @@ fun QuizSetupScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(
+            text = categoryName,
+            fontSize = 24.sp,
+            color = DarkPrimary,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
         Text(
             text = stringResource(id = R.string.setup_title),
             fontSize = 28.sp,
@@ -108,8 +120,8 @@ fun QuizSetupScreen(navController: NavController) {
         Slider(
             value = questionCount.toFloat(),
             onValueChange = { questionCount = it.toInt() },
-            valueRange = 5f..50f,
-            steps = 8,
+            valueRange = 1f..20f,
+            steps = 18,
             modifier = Modifier.fillMaxWidth(),
             colors = SliderDefaults.colors(
                 thumbColor = DarkPrimary,
@@ -119,7 +131,11 @@ fun QuizSetupScreen(navController: NavController) {
         )
 
         androidx.compose.material3.Surface(
-            onClick = { navController.navigate(Screen.Quiz.route) },
+            onClick = {
+                navController.navigate(
+                    Screen.Quiz.createRoute(categoryId, difficulty, questionCount)
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp)

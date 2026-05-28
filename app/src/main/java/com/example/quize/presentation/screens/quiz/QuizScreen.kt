@@ -3,55 +3,45 @@ package com.example.quize.presentation.screens.quiz
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.quize.R
 import com.example.quize.presentation.navigation.Screen
+import com.example.quize.presentation.viewmodel.QuizViewModel
 import com.example.quize.ui.theme.*
 
-data class Question(
-    val text: String,
-    val answers: List<String>,
-    val correctIndex: Int
-)
-
 @Composable
-fun QuizScreen(navController: NavController) {
-    val questions = remember {
-        listOf(
-            Question("What is the capital of France?", listOf("London", "Berlin", "Paris", "Madrid"), 2),
-            Question("Which planet is known as the Red Planet?", listOf("Venus", "Mars", "Jupiter", "Saturn"), 1),
-            Question("What is 2 + 2?", listOf("3", "4", "5", "6"), 1),
-            Question("Who wrote 'Romeo and Juliet'?", listOf("Charles Dickens", "William Shakespeare", "Mark Twain", "Jane Austen"), 1),
-            Question("What is the largest ocean?", listOf("Atlantic", "Indian", "Arctic", "Pacific"), 3)
-        )
+fun QuizScreen(
+    navController: NavController,
+    categoryId: Int,
+    difficulty: String,
+    amount: Int
+) {
+    val viewModel: QuizViewModel = viewModel()
+
+    LaunchedEffect(categoryId, difficulty, amount) {
+        viewModel.reset()
+        viewModel.loadQuestions(amount, categoryId, difficulty)
     }
-
-    var currentIndex by remember { mutableIntStateOf(0) }
-    var score by remember { mutableIntStateOf(0) }
-    var selectedAnswer by remember { mutableIntStateOf(-1) }
-    var answered by remember { mutableStateOf(false) }
-
-    val currentQuestion = questions[currentIndex]
-    val progress = (currentIndex + 1).toFloat() / questions.size
 
     Column(
         modifier = Modifier
@@ -60,107 +50,122 @@ fun QuizScreen(navController: NavController) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        LinearProgressIndicator(
-            progress = { progress },
-            modifier = Modifier.fillMaxWidth(),
-            color = DarkPrimary,
-            trackColor = DarkOutline
-        )
-
-        Text(
-            text = stringResource(id = R.string.quiz_question_counter, currentIndex + 1, questions.size),
-            style = MaterialTheme.typography.titleLarge,
-            color = DarkOnSurface,
-            modifier = Modifier.padding(top = 16.dp)
-        )
-
-        Text(
-            text = stringResource(id = R.string.quiz_score_label, score),
-            style = MaterialTheme.typography.bodyLarge,
-            color = DarkSecondary,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = DarkSurface
-            )
-        ) {
-            Text(
-                text = currentQuestion.text,
-                style = MaterialTheme.typography.bodyLarge,
-                color = DarkOnSurface,
-                modifier = Modifier.padding(20.dp)
-            )
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            currentQuestion.answers.forEachIndexed { index, answer ->
-                val isCorrect = index == currentQuestion.correctIndex
-                val isSelected = index == selectedAnswer
-
-                val containerColor = when {
-                    answered && isCorrect -> DarkPrimary
-                    answered && isSelected -> DarkError
-                    else -> DarkSurfaceVariant
+        when {
+            viewModel.isLoading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = DarkPrimary)
                 }
+            }
 
-                val textColor = when {
-                    answered && isCorrect -> DarkOnPrimary
-                    answered && isSelected -> DarkOnError
-                    else -> DarkOnSurfaceVariant
-                }
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(enabled = !answered) {
-                            selectedAnswer = index
-                            answered = true
-                            if (index == currentQuestion.correctIndex) score++
-                        },
-                    colors = CardDefaults.cardColors(containerColor = containerColor)
-                ) {
+            viewModel.error.isNotEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        text = answer,
-                        color = textColor,
-                        modifier = Modifier.padding(16.dp)
+                        text = "Error: ${viewModel.error}",
+                        color = DarkError,
+                        fontSize = 16.sp
                     )
                 }
             }
-        }
 
-        if (answered) {
-            androidx.compose.material3.Button(
-                onClick = {
-                    if (currentIndex < questions.lastIndex) {
-                        currentIndex++
-                        selectedAnswer = -1
-                        answered = false
-                    } else {
-                        navController.navigate(Screen.Score.route)
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = DarkPrimary
+            viewModel.questions.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "No questions found",
+                        color = DarkOnSurfaceVariant,
+                        fontSize = 16.sp
+                    )
+                }
+            }
+
+            else -> {
+                val currentQuestion = viewModel.questions[viewModel.currentIndex]
+                val progress = (viewModel.currentIndex + 1).toFloat() / viewModel.questions.size
+
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = DarkPrimary,
+                    trackColor = DarkOutline
                 )
-            ) {
+
                 Text(
-                    text = if (currentIndex < questions.lastIndex)
-                        stringResource(id = R.string.quiz_button_next)
-                    else
-                        stringResource(id = R.string.quiz_button_finish),
-                    color = DarkOnPrimary
+                    text = stringResource(
+                        id = R.string.quiz_question_counter,
+                        viewModel.currentIndex + 1,
+                        viewModel.questions.size
+                    ),
+                    fontSize = 14.sp,
+                    color = DarkOnSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 16.dp)
                 )
+
+                Text(
+                    text = currentQuestion.text,
+                    fontSize = 20.sp,
+                    color = DarkOnSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+
+                currentQuestion.answers.forEachIndexed { index, answer ->
+                    val isSelected = viewModel.selectedAnswer == index
+                    val isCorrect = answer == currentQuestion.correctAnswer
+
+                    val cardColor = when {
+                        !viewModel.answered -> DarkSurface
+                        isCorrect -> DarkPrimaryContainer
+                        isSelected -> DarkError.copy(alpha = 0.3f)
+                        else -> DarkSurface
+                    }
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                            .clickable(enabled = !viewModel.answered) {
+                                viewModel.selectAnswer(index)
+                            },
+                        colors = CardDefaults.cardColors(containerColor = cardColor),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    ) {
+                        Text(
+                            text = answer,
+                            modifier = Modifier.padding(16.dp),
+                            color = DarkOnSurface,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+
+                if (viewModel.answered) {
+                    androidx.compose.material3.Button(
+                        onClick = {
+                            val hasNext = viewModel.nextQuestion()
+                            if (!hasNext) {
+                                navController.navigate(
+                                    Screen.Score.createRoute(viewModel.score, viewModel.questions.size)
+                                ) {
+                                    popUpTo(Screen.Home.route)
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 24.dp),
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = DarkPrimary
+                        )
+                    ) {
+                        Text(
+                            text = if (viewModel.currentIndex < viewModel.questions.lastIndex)
+                                stringResource(id = R.string.quiz_button_next)
+                            else
+                                "Finish (${viewModel.score}/${viewModel.questions.size})",
+                            color = DarkOnPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
         }
     }
